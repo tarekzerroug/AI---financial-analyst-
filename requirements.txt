@@ -3,3 +3,5 @@ numpy
 yfinance
 sqlalchemy
 python-dotenv
+lxml
+psycopg2
