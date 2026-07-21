@@ -6,3 +6,7 @@ python-dotenv
 lxml
 psycopg2
 numpy
+fastapi
+uvicorn
+streamlit
+plotly

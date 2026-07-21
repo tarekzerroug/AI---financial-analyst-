@@ -1,15 +1,11 @@
+from pathlib import Path
+
 import yfinance as yf
 import pandas as pd
-from sqlalchemy import create_engine
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
+from app.database.connection import engine
 
-user = os.getenv('DB_user')
-password = os.getenv('DB_password')
-db_name = os.getenv('DB_name')
-engine = create_engine(f'postgresql://{user}:{password}@localhost:5432/{db_name}')
+TICKERS_CSV = Path(__file__).resolve().parents[1] / "data" / "sp500_tickers.csv"
 
 def fetch_and_store_price(ticker):
     data = yf.download(ticker, start="2024-01-01", end="2026-04-29")
@@ -25,8 +21,11 @@ def fetch_and_store_price(ticker):
     
 
 def main():
-    tickers = pd.read_csv("../data/sp500_tickers.csv")["Symbol"].tolist()
+    tickers = pd.read_csv(TICKERS_CSV)["Symbol"].tolist()
     for ticker in tickers:
         fetch_and_store_price(ticker)
     print("Data fetching and storing completed.")
-main()
+
+
+if __name__ == "__main__":
+    main()
