@@ -7,8 +7,8 @@ from app.database.connection import engine
 
 TICKERS_CSV = Path(__file__).resolve().parents[1] / "data" / "sp500_tickers.csv"
 
-def fetch_and_store_price(ticker):
-    data = yf.download(ticker, start="2024-01-01", end="2026-04-29")
+def fetch_and_store_price(start, end, ticker):
+    data = yf.download(ticker, start=start, end=end)
 
     data.reset_index(inplace=True)  
     data['ticker'] = ticker
@@ -23,7 +23,7 @@ def fetch_and_store_price(ticker):
 def main():
     tickers = pd.read_csv(TICKERS_CSV)["Symbol"].tolist()
     for ticker in tickers:
-        fetch_and_store_price(ticker)
+        fetch_and_store_price(start  , end , ticker)
     print("Data fetching and storing completed.")
 
 
