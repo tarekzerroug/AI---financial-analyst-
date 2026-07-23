@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend ./backend
-
+COPY .env .
 WORKDIR /app/backend
 
 CMD ["python3", "-m", "app.collectors.sync_prices"]

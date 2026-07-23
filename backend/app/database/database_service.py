@@ -16,13 +16,22 @@ class DatabaseService:
         df = pd.read_sql(query, engine, params={"ticker": ticker.upper()})
         return df
    
-    def get_latest_timestamp(self):
-        query = text("""
-        SELECT MAX(date) AS latest_timestamp
-        FROM prices
-      
-        """)
-        result = pd.read_sql(query, engine)
+    def get_latest_timestamp(self, ticker=None):
+        if ticker:
+            query = text("""
+            SELECT MAX(date) AS latest_timestamp
+            FROM prices
+            WHERE ticker = :ticker
+            """)
+            params = {"ticker": ticker.upper()}
+        else:
+            query = text("""
+            SELECT MAX(date) AS latest_timestamp
+            FROM prices
+            """)
+            params = None
+
+        result = pd.read_sql(query, engine, params=params)
         if result.empty or result['latest_timestamp'].isnull().all():
             return None
         return result['latest_timestamp'].iloc[0]

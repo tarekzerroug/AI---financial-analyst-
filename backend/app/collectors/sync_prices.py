@@ -1,7 +1,7 @@
 from os import sync
 from app.collectors.fetch_prices import fetch_and_store_price
 from app.database.database_service import DatabaseService
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd 
 from pathlib import Path
 import yfinance as yf
@@ -13,8 +13,9 @@ TICKERS_CSV = Path(__file__).resolve().parents[1] / "data" / "sp500_tickers.csv"
 
 
 def sync_prices(ticker):
+    ticker = ticker.upper()
 
-    latest_timestamp = db.get_latest_timestamp()
+    latest_timestamp = db.get_latest_timestamp(ticker)
 
     if latest_timestamp is None:
 
@@ -22,14 +23,33 @@ def sync_prices(ticker):
 
     else:
 
-        start = latest_timestamp.strftime("%Y-%m-%d")
-    
-    end = datetime.now().strftime("%Y-%m-%d")
+        start = (latest_timestamp + timedelta(days=1)).strftime("%Y-%m-%d")
 
-    data = yf.download(ticker, start=start, end=end)
     
-    data.reset_index(inplace=True)  
-    data['ticker'] = ticker
+    end = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    if start >= end:
+        print(f"No new date range for {ticker}: {start} -> {end}")
+        return
+
+    data = yf.download(
+        ticker,
+        start=start,
+        end=end,
+        progress=False,
+        auto_adjust=False,
+    )
+
+    if data.empty:
+        print(f"No new data for {ticker}")
+        return
+
+    data.reset_index(inplace=True)
+
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.get_level_values(0)
+
+    data["ticker"] = ticker
     data = data[["Date", "ticker", "Open", "Close", "Volume"]]
     
         
@@ -43,4 +63,3 @@ for ticker in tickers:
 
 
 print("Data fetching and storing completed.xample ticker, replace with your desired ticker")
-
