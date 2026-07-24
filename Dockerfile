@@ -1,18 +1,16 @@
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend ./backend
-COPY .env .
+
 WORKDIR /app/backend
 
-CMD ["python3", "-m", "app.collectors.sync_prices"]
+CMD ["python3", "-m", "app.collectors.price_scheduler"]

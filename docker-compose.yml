@@ -1,0 +1,23 @@
+services:
+  api:
+    build: .
+    image: ai-financial-analyst:latest
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    restart: unless-stopped
+
+  price-sync:
+    build: .
+    image: ai-financial-analyst:latest
+    env_file:
+      - .env
+    environment:
+      PRICE_SYNC_TIMEZONE: America/Toronto
+      PRICE_SYNC_HOUR: "18"
+      PRICE_SYNC_MINUTE: "0"
+      PRICE_SYNC_RUN_ON_START: "true"
+    command: ["python3", "-m", "app.collectors.price_scheduler"]
+    restart: unless-stopped

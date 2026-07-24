@@ -1,11 +1,11 @@
-from os import sync
-from app.collectors.fetch_prices import fetch_and_store_price
-from app.database.database_service import DatabaseService
 from datetime import datetime, timedelta
-import pandas as pd 
 from pathlib import Path
+
+import pandas as pd
 import yfinance as yf
+
 from app.database.connection import engine
+from app.database.database_service import DatabaseService
 
 db = DatabaseService()
 
@@ -57,9 +57,31 @@ def sync_prices(ticker):
     data.to_sql("prices", engine, if_exists="append", index=False)
 
 
-tickers = pd.read_csv(TICKERS_CSV)["Symbol"].tolist()
-for ticker in tickers:
-    sync_prices(ticker)
+def load_tickers():
+    tickers = pd.read_csv(TICKERS_CSV)["Symbol"]
+    return tickers.dropna().astype(str).str.strip().str.upper().tolist()
 
 
-print("Data fetching and storing completed.xample ticker, replace with your desired ticker")
+def sync_all_prices():
+    tickers = load_tickers()
+    failures = []
+
+    for ticker in tickers:
+        try:
+            sync_prices(ticker)
+        except Exception as exc:
+            failures.append(ticker)
+            print(f"Failed to sync {ticker}: {exc}")
+
+    if failures:
+        print(f"Price sync completed with {len(failures)} failed ticker(s): {failures}")
+    else:
+        print("Price sync completed successfully.")
+
+
+def main():
+    sync_all_prices()
+
+
+if __name__ == "__main__":
+    main()
