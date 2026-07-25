@@ -10,3 +10,11 @@ fastapi
 uvicorn
 streamlit
 plotly
+datasets
+torch 
+transformers
+peft
+trl 
+accelerate 
+bitsandbytes 
+scikit-learn
