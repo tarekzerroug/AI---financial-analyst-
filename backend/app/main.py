@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.api.prices import router as prices_router
+from app.api.news import router as news_router
 
 app = FastAPI(
     title="AI Financial Analyst API",
@@ -9,7 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(prices_router)
-
+app.include_router(news_router)
 
 @app.get("/")
 def root():
