@@ -41,8 +41,8 @@ function compactNews(article) {
     source: article.source,
     summary: article.summary,
     published_at: article.time_published || article.published_at,
-    sentiment: article.overall_sentiment_label,
-    score: article.overall_sentiment_score
+    sentiment: article.ticker_sentiment_label || article.overall_sentiment_label,
+    score: article.ticker_sentiment_score || article.overall_sentiment_score
   };
 }
 
@@ -95,14 +95,14 @@ export default function App() {
       const cleanTicker = ticker.trim().toUpperCase();
       const [priceRows, newsRows] = await Promise.all([
         fetchJson(`/prices/${cleanTicker}`),
-        fetchJson(`/news/${cleanTicker}`).catch(() => [])
+        fetchJson(`/news/${cleanTicker}?limit=5`).catch(() => [])
       ]);
 
       const orderedPrices = [...priceRows].sort((a, b) => parseDate(a.date) - parseDate(b.date));
       const latest = orderedPrices.at(-1);
       const nextDate = selectedDate || dateOnly(latest?.date);
       const nextPriceRow = closestRow(orderedPrices, nextDate);
-      const nextNews = newsRows.slice(0, 6).map(compactNews);
+      const nextNews = newsRows.slice(0, 5).map(compactNews);
       const nextPrompt = makePrompt({
         ticker: cleanTicker,
         priceRow: nextPriceRow,

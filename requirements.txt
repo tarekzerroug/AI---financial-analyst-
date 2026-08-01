@@ -3,6 +3,7 @@ numpy
 yfinance
 sqlalchemy
 python-dotenv
+requests
 lxml
 psycopg2-binary
 apscheduler

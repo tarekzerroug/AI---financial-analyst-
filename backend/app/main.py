@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.prices import router as prices_router
 from app.api.news import router as news_router
+from app.api.analysis import router as analysis_router
 
 app = FastAPI(
     title="AI Financial Analyst API",
@@ -15,8 +16,10 @@ app = FastAPI(
 
 app.include_router(prices_router)
 app.include_router(news_router)
+app.include_router(analysis_router)
 app.include_router(prices_router, prefix="/api")
 app.include_router(news_router, prefix="/api")
+app.include_router(analysis_router, prefix="/api")
 
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
@@ -48,7 +51,7 @@ def frontend():
 
 @app.get("/{path:path}")
 def frontend_fallback(path: str):
-    if path.startswith(("api/", "prices", "news")):
+    if path.startswith(("api/", "prices", "news", "analysis")):
         raise HTTPException(status_code=404, detail="Not found")
 
     if FRONTEND_DIST.exists():
